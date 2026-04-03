@@ -14,17 +14,17 @@ const { fetchChartData } = require('../services/dataService');
  *         name: inicio
  *         schema:
  *           type: integer
- *         description: Timestamp em milissegundos do início do período (ex: 1775098800000)
+ *         description: "Timestamp em milissegundos do início do período (ex: 1775098800000)"
  *       - in: query
  *         name: fim
  *         schema:
  *           type: integer
- *         description: Timestamp em milissegundos do fim do período (ex: 1775185140000)
+ *         description: "Timestamp em milissegundos do fim do período (ex: 1775185140000)"
  *       - in: query
  *         name: titulo
  *         schema:
  *           type: string
- *         description: Título do gráfico (padrão: "Pontuações")
+ *         description: "Título do gráfico (padrão: Pontuações)"
  *     responses:
  *       200:
  *         description: Imagem PNG do gráfico

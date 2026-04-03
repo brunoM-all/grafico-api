@@ -7,6 +7,7 @@ const chartRoutes = require('./routes/chart');
 const app = express();
 app.use(express.json());
 
+app.get('/docs/spec', (req, res) => res.json(swaggerSpec));
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/chart', chartRoutes);
 
