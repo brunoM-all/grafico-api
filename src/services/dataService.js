@@ -2,7 +2,7 @@ const axios = require('axios');
 
 const EXTERNAL_API_URL = process.env.EXTERNAL_API_URL;
 
-async function fetchChartData({ inicio, fim } = {}) {
+async function fetchChartData({ inicio, fim, titulo } = {}) {
   if (!EXTERNAL_API_URL) {
     throw new Error('EXTERNAL_API_URL não configurada no .env');
   }
@@ -26,7 +26,7 @@ async function fetchChartData({ inicio, fim } = {}) {
   const date = resolveSubtitle(inicio, fim);
 
   return {
-    title: 'Pontuações',
+    title: titulo || 'Pontuações',
     subtitle: date,
     players,
   };
