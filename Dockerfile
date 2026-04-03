@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:20-slim AS base
 
 # Dependências do sistema para o canvas (chartjs-node-canvas)
 RUN apt-get update && apt-get install -y \
@@ -12,12 +12,18 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-
 COPY package*.json ./
-RUN npm install --production
 
+# Estágio dev: instala tudo (incluindo devDependencies) para hot-reload
+FROM base AS dev
+RUN npm install
 COPY src/ ./src/
-
 EXPOSE 3000
+CMD ["npm", "run", "dev"]
 
+# Estágio produção: somente dependências de produção
+FROM base AS production
+RUN npm install --production
+COPY src/ ./src/
+EXPOSE 3000
 CMD ["node", "src/app.js"]

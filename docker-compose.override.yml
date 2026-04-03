@@ -1,0 +1,15 @@
+version: '3.9'
+
+# Este arquivo é carregado automaticamente pelo docker-compose em modo dev.
+# Monta o código-fonte como volume e usa nodemon para hot-reload.
+services:
+  grafico-api:
+    build:
+      context: .
+      target: dev
+    volumes:
+      - ./src:/app/src
+      - ./package.json:/app/package.json
+    command: npm run dev
+    environment:
+      - NODE_ENV=development
