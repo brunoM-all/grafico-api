@@ -25,6 +25,11 @@ const { fetchChartData } = require('../services/dataService');
  *         schema:
  *           type: string
  *         description: "Título do gráfico (padrão: Pontuações)"
+ *       - in: query
+ *         name: subtitulo
+ *         schema:
+ *           type: string
+ *         description: "Período exibido abaixo do título (padrão: gerado a partir de inicio/fim)"
  *     responses:
  *       200:
  *         description: Imagem PNG do gráfico
@@ -75,6 +80,7 @@ router.get('/live', async (req, res) => {
  *                 example: Pontuações
  *               subtitle:
  *                 type: string
+ *                 description: Período exibido abaixo do título
  *                 example: 02/04/2026 — Dia completo
  *               players:
  *                 type: array
