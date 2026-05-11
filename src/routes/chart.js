@@ -1,7 +1,82 @@
 const express = require('express');
 const router = express.Router();
-const { generateChart } = require('../services/chartService');
-const { fetchChartData } = require('../services/dataService');
+const { generateChart, generateRangeChart } = require('../services/chartService');
+const { fetchChartData, fetchChartDataRange } = require('../services/dataService');
+
+/**
+ * @swagger
+ * /chart/range:
+ *   get:
+ *     summary: Gera gráfico comparativo por intervalo de datas
+ *     description: Faz uma chamada à API externa por dia no intervalo e retorna um gráfico de barras agrupadas por data.
+ *     parameters:
+ *       - in: query
+ *         name: inicio
+ *         schema:
+ *           type: string
+ *         description: "Data inicial no formato dd/mm/yyyy (ex: 05/05/2026)"
+ *       - in: query
+ *         name: fim
+ *         schema:
+ *           type: string
+ *         description: "Data final no formato dd/mm/yyyy (ex: 11/05/2026)"
+ *       - in: query
+ *         name: dias
+ *         schema:
+ *           type: string
+ *         description: "Datas específicas separadas por vírgula (ex: 05/05/2026,07/05/2026,09/05/2026)"
+ *       - in: query
+ *         name: titulo
+ *         schema:
+ *           type: string
+ *         description: "Título do gráfico (padrão: Pontuações por período)"
+ *       - in: query
+ *         name: subtitulo
+ *         schema:
+ *           type: string
+ *         description: "Subtítulo exibido abaixo do título"
+ *     responses:
+ *       200:
+ *         description: Imagem PNG do gráfico
+ *         content:
+ *           image/png:
+ *             schema:
+ *               type: string
+ *               format: binary
+ *       400:
+ *         description: Parâmetros inválidos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Erro ao buscar dados ou gerar gráfico
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.get('/range', async (req, res) => {
+  try {
+    const { inicio, fim, dias, titulo, subtitulo } = req.query;
+    if (!dias && (!inicio || !fim)) {
+      return res.status(400).json({ error: 'Informe "inicio" e "fim" (dd/mm/yyyy) ou "dias" (datas separadas por vírgula)' });
+    }
+    const data = await fetchChartDataRange({ inicio, fim, dias, titulo, subtitulo });
+    const imageBuffer = await generateRangeChart(data);
+    res.set('Content-Type', 'image/png');
+    res.send(imageBuffer);
+  } catch (err) {
+    console.error('Erro no /chart/range:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 /**
  * @swagger

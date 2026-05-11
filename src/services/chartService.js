@@ -109,4 +109,89 @@ async function generateChart({ title, subtitle, players }) {
   return renderer.renderToBuffer(configuration);
 }
 
-module.exports = { generateChart };
+const DEVICE_COLORS = [
+  '#4b44cd', // roxo escuro
+  '#a78bfa', // lavanda
+  '#60a5fa', // azul
+  '#34d399', // verde
+  '#f472b6', // rosa
+];
+
+async function generateRangeChart({ title, subtitle, labels, datasets }) {
+  const width = Math.max(1400, labels.length * 180);
+  const rangeRenderer = new ChartJSNodeCanvas({ width, height: HEIGHT, backgroundColour: BG });
+
+  const chartDatasets = datasets.map((ds, i) => ({
+    label: ds.name,
+    data: ds.data,
+    backgroundColor: DEVICE_COLORS[i % DEVICE_COLORS.length],
+    borderRadius: 4,
+    borderSkipped: false,
+    barPercentage: 0.85,
+    categoryPercentage: 0.7,
+  }));
+
+  const allValues = datasets.flatMap(ds => ds.data).filter(v => v > 0);
+  const minVal = allValues.length ? Math.min(...allValues) : 0;
+
+  const configuration = {
+    type: 'bar',
+    data: { labels, datasets: chartDatasets },
+    options: {
+      responsive: false,
+      animation: false,
+      layout: { padding: { top: 30, left: 10, right: 10, bottom: 10 } },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { color: '#9ca3af', font: { size: 13 }, padding: 20 },
+        },
+        title: {
+          display: true,
+          text: [title || 'Pontuações por período', subtitle || ''],
+          color: '#9ca3af',
+          font: { size: 15, weight: 'normal' },
+          padding: { top: 0, bottom: 12 },
+        },
+      },
+      scales: {
+        x: {
+          ticks: { color: '#9ca3af', font: { size: 12 } },
+          grid: { display: false },
+          border: { display: false },
+        },
+        y: {
+          min: Math.max(0, minVal - 20),
+          ticks: { color: '#6b7280', font: { size: 12 }, maxTicksLimit: 8 },
+          grid: { color: '#25253a' },
+          border: { display: false },
+        },
+      },
+    },
+    plugins: [{
+      id: 'barLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx } = chart;
+        chart.data.datasets.forEach((_, datasetIndex) => {
+          const meta = chart.getDatasetMeta(datasetIndex);
+          meta.data.forEach((bar, index) => {
+            const value = chart.data.datasets[datasetIndex].data[index];
+            if (!value) return;
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 13px sans-serif';
+            ctx.fillText(value, bar.x, bar.y - 4);
+            ctx.restore();
+          });
+        });
+      },
+    }],
+  };
+
+  return rangeRenderer.renderToBuffer(configuration);
+}
+
+module.exports = { generateChart, generateRangeChart };
