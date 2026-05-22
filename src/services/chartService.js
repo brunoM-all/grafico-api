@@ -133,6 +133,7 @@ async function generateRangeChart({ title, subtitle, labels, datasets }) {
 
   const allValues = datasets.flatMap(ds => ds.data).filter(v => v > 0);
   const minVal = allValues.length ? Math.min(...allValues) : 0;
+  const maxVal = allValues.length ? Math.max(...allValues) : 100;
 
   const configuration = {
     type: 'bar',
@@ -163,6 +164,7 @@ async function generateRangeChart({ title, subtitle, labels, datasets }) {
         },
         y: {
           min: Math.max(0, minVal - 20),
+          max: Math.ceil(maxVal * 1.15),
           ticks: { color: '#6b7280', font: { size: 12 }, maxTicksLimit: 8 },
           grid: { color: '#25253a' },
           border: { display: false },
