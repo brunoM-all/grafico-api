@@ -115,6 +115,8 @@ const DEVICE_COLORS = [
   '#60a5fa', // azul
   '#34d399', // verde
   '#f472b6', // rosa
+  '#fb923c', // laranja
+  '#22d3ee', // ciano
 ];
 
 async function generateRangeChart({ title, subtitle, labels, datasets }) {
